@@ -18,7 +18,7 @@ import androidx.navigation.NavController
 
 @Composable
 fun LineSelectionScreen(navController: NavController) {
-    val lines = listOf("371", "472", "103", "104") // Exemplo de linhas de ônibus
+    val lines = listOf("371", "472", "103", "104")
 
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         Text("Escolha uma linha de ônibus:", fontSize = 20.sp, fontWeight = FontWeight.Bold)

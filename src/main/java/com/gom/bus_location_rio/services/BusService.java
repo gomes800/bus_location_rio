@@ -7,7 +7,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,11 +30,29 @@ public class BusService {
         return busRioClient.getBus(dataInicial, dataFinal);
     }
 
+    private List<Bus> processLatestPositions(List<Bus> buses) {
+        return new ArrayList<>(buses.stream()
+                .collect(Collectors.toMap(
+                        Bus::getOrdem,
+                        Function.identity(),
+                        (existing, replacement) -> {
+                            long existingTime = existing.getDataHoraEnvio();
+                            long replacementTime = replacement.getDataHoraEnvio();
+
+                            return existingTime > replacementTime ? existing : replacement;
+                        }
+                ))
+                .values());
+    }
+
+
     public List<Bus> getBusByLine(String line) {
         List<Bus> allBuses = getAllBus();
 
-        return allBuses.stream()
+        List<Bus> busesByLine = allBuses.stream()
                 .filter(bus -> bus.getLinha().equals(line))
                 .collect(Collectors.toList());
+
+        return processLatestPositions(busesByLine);
     }
 }

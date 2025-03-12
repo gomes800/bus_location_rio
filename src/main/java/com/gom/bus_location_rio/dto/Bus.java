@@ -2,6 +2,7 @@ package com.gom.bus_location_rio.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,9 +12,11 @@ public class Bus {
 
     private String ordem;
 
+    @Getter(AccessLevel.NONE)
     @JsonProperty("latitude")
     private String latitudeRaw;
 
+    @Getter(AccessLevel.NONE)
     @JsonProperty("longitude")
     private String longitudeRaw;
 
@@ -31,13 +34,27 @@ public class Bus {
     @JsonProperty("datahoraservidor")
     private long dataHoraServidor;
 
-    @JsonIgnore
+    @JsonProperty("latitude")
     public double getLatitude() {
-        return Double.parseDouble(latitudeRaw.replace(",", "."));
+        return parseCoordinate(latitudeRaw);
     }
 
-    @JsonIgnore
+    @JsonProperty("longitude")
     public double getLongitude() {
-        return Double.parseDouble(longitudeRaw.replace(",", "."));
+        return parseCoordinate(longitudeRaw);
+    }
+
+    private double parseCoordinate(String rawCoordinate) {
+        if (rawCoordinate == null || rawCoordinate.isEmpty()) {
+            return 0.0;
+        }
+
+        try {
+            String formattedCoordinate = rawCoordinate.replace(",", ".");
+            return Double.parseDouble(formattedCoordinate);
+        } catch (NumberFormatException e) {
+            System.out.println("Erro ao converter a coordenada: " + e.getMessage());
+            return 0.0;
+        }
     }
 }
